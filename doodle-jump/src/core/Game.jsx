@@ -20,14 +20,20 @@ const DOOD_HEIGHT = 60;
 // const DOOD_WIDTH = 50; // ball
 // const DOOD_HEIGHT = 50;
 
-const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
+const Game = ({
+	setIsGameOver,
+	resetGame,
+	setResetGame,
+	setScore,
+	// setMaxHeight,
+	// maxHeight,
+}) => {
 	const [tick, setTick] = useState(0);
-	const [isSquished, setIsSquished] = useState(false);
-	const [maxHeight, setMaxHeight] = useState(0);
+	// const [isSquished, setIsSquished] = useState(false);
 
 	const platformRef = useRef([
-		{ x: 155, y: 480, width: PLATFORM_WIDTH },
-		{ x: 250, y: 350, width: PLATFORM_WIDTH },
+		{ x: 155, y: 480, width: PLATFORM_WIDTH, touched: false },
+		{ x: 250, y: 350, width: PLATFORM_WIDTH, touched: false },
 	]);
 
 	const lastTimeRef = useRef(performance.now());
@@ -96,8 +102,6 @@ const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
 					dood.x + DOOD_WIDTH > p.x && // horizontal overlap
 					dood.x < p.x + p.width;
 
-				// console.log('isSquished', isSquished);
-
 				if (touching) {
 					// Place dood exactly on top of the platform
 					dood.y = p.y - DOOD_HEIGHT;
@@ -105,14 +109,22 @@ const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
 					// Bounce
 					dood.velocityY = dood.jumpStrength;
 
-					// setScore(Math.max(prev, Math.floor(-p.y / 10)));
-					// setScore((prev) => prev + 10);
-					// setMaxHeight();
+					// Scoring
+					if (p.touched) return;
+					p.touched = true; // you have landed on ('touched') the platform
 
-					setIsSquished(true);
+					const platformHeightScore = 600 - p.y;
 
+					// setMaxHeight((prev) =>
+					// 	Math.round(Math.max(prev, platformHeightScore)),
+					// );
+					setScore((prev) => (prev += Math.round(platformHeightScore)));
+
+					setTick((t) => t + 1); // triggers a re-render
+
+					// setIsSquished(true);
 					// Remove squish after 150ms
-					setTimeout(() => setIsSquished(false), 150);
+					// setTimeout(() => setIsSquished(false), 150);
 				}
 			}
 		}
@@ -288,6 +300,7 @@ const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
 				y: 250,
 				width: PLATFORM_WIDTH,
 				height: PLATFORM_HEIGHT,
+				touched: false,
 			};
 
 			const p4 = {
@@ -295,6 +308,7 @@ const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
 				y: 600 - 6 * 80,
 				width: PLATFORM_WIDTH,
 				height: PLATFORM_HEIGHT,
+				touched: false,
 			};
 
 			const p5 = {

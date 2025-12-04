@@ -8,6 +8,7 @@ function App() {
   const [resetGame, setResetGame] = useState(false);
 
   const [score, setScore] = useState(0);
+  // const [maxHeight, setMaxHeight] = useState(0);
 
   function restartGame() {
     setIsGameOver(false);
@@ -25,6 +26,8 @@ function App() {
             resetGame={resetGame}
             setResetGame={setResetGame}
             setScore={setScore}
+            // setMaxHeight={setMaxHeight}
+            // maxHeight={maxHeight}
           />
 
           {isGameOver && (

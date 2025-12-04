@@ -13,10 +13,10 @@ function App() {
     <>
       <div className="App">
         <div className="grid">
-          <Game />
-          <div className="platforms-group">
+          <Game setIsGameOver={setIsGameOver} />
+          {/*<div className="platforms-group">
             <div className="platform"></div>
-          </div>
+          </div>*/}
 
           {isGameOver && <div className="game-over">GAME OVER</div>}
         </div>

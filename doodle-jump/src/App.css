@@ -5,6 +5,7 @@
   position: relative;
   font-size: 100px;
   text-align: center;
+  overflow: hidden;
 }
 
 .doodler {
@@ -16,10 +17,6 @@
   top: 0;
   z-index: 1;
   /*transition: transform 0.05s linear;*/
-
-  /* bottom: 100px; */
-  /*bottom: 0px;*/
-  /*left: 100px;*/
 }
 
 .platform {
@@ -27,4 +24,12 @@
   height: 15px;
   background-image: url('./assets/platform.png');
   position: absolute;
+}
+
+.game-over {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  font-size: 94px;
+  line-height: 1;
 }

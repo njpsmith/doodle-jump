@@ -7,6 +7,8 @@ function App() {
   const [isGameOver, setIsGameOver] = useState(false);
   const [resetGame, setResetGame] = useState(false);
 
+  const [score, setScore] = useState(0);
+
   function restartGame() {
     setIsGameOver(false);
     setResetGame(true);
@@ -16,10 +18,13 @@ function App() {
     <>
       <div className="App">
         <div className="grid">
+          <div className="score">Score: {score}</div>
+
           <Game
             setIsGameOver={setIsGameOver}
             resetGame={resetGame}
             setResetGame={setResetGame}
+            setScore={setScore}
           />
 
           {isGameOver && (

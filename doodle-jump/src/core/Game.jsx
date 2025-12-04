@@ -11,11 +11,14 @@ const OUT_OF_BOUNDS_HEIGHT = 650;
 
 const SCROLL_THRESHOLD = 220; // px
 
-const doodWidth = 87;
-const doodHeight = 85;
+// const DOOD_WIDTH = 87;
+// const DOOD_HEIGHT = 85;
+const DOOD_WIDTH = 50;
+const DOOD_HEIGHT = 50;
 
-const Game = ({ setIsGameOver, resetGame, setResetGame }) => {
+const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
 	const [tick, setTick] = useState(0);
+	const [isSquished, setIsSquished] = useState(false);
 
 	const platformRef = useRef([
 		{ x: 155, y: 480, width: PLATFORM_WIDTH },
@@ -77,23 +80,33 @@ const Game = ({ setIsGameOver, resetGame, setResetGame }) => {
 				// Vertical overlap (touching the top surface)
 				// const tolerance = 5; // 5px tolerance
 
-				const previousFeetY = dood.yPrev + doodHeight;
-				const currentFeetY = dood.y + doodHeight;
+				const previousFeetY = dood.yPrev + DOOD_HEIGHT;
+				const currentFeetY = dood.y + DOOD_HEIGHT;
 
 				// Instead of just checking dood's feet position (feetY) against p.y at the current frame, check if dood passes through the platform between the previous and current frame. This prevents missed collisions, which can happen when dood’s vertical velocity is high enough that, in a single frame, his feet move from above the platform to below it, without your collision check ever triggering.
 				const touching =
 					dood.velocityY > 0 && // only when falling
 					currentFeetY >= p.y && // currently below or at platform
 					previousFeetY <= p.y && // was above platform last frame
-					dood.x + doodWidth > p.x && // horizontal overlap
+					dood.x + DOOD_WIDTH > p.x && // horizontal overlap
 					dood.x < p.x + p.width;
+
+				// console.log('isSquished', isSquished);
 
 				if (touching) {
 					// Place dood exactly on top of the platform
-					dood.y = p.y - doodHeight;
+					dood.y = p.y - DOOD_HEIGHT;
 
 					// Bounce
 					dood.velocityY = dood.jumpStrength;
+
+					// setScore(Math.max(prev, Math.floor(-p.y / 10)));
+					setScore((prev) => prev + 10);
+
+					setIsSquished(true);
+
+					// Remove squish after 150ms
+					setTimeout(() => setIsSquished(false), 150);
 				}
 			}
 		}
@@ -110,9 +123,9 @@ const Game = ({ setIsGameOver, resetGame, setResetGame }) => {
 		// }
 
 		if (dood.y < SCROLL_THRESHOLD) {
-			console.log('ABOVE THRESHOLD OF', SCROLL_THRESHOLD);
+			// console.log('ABOVE THRESHOLD OF', SCROLL_THRESHOLD);
 			const shift = SCROLL_THRESHOLD - dood.y; // how much dood has moved above threshold
-			console.log('shift', shift);
+			// console.log('shift', shift);
 			dood.y = SCROLL_THRESHOLD; // keep doodler at threshold
 
 			// Move all platforms down by the same amount
@@ -319,7 +332,11 @@ const Game = ({ setIsGameOver, resetGame, setResetGame }) => {
 	return (
 		<>
 			<Platforms doodRef={doodRef} platformRef={platformRef} />
-			<div id="dood" className="doodler"></div>
+			{/*<div id="dood" className="doodler"></div>*/}
+
+			<div id="dood" className="doodler">
+				<div className={`ball ${isSquished ? 'squish' : ''}`}></div>
+			</div>
 		</>
 	);
 };

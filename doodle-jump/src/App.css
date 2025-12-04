@@ -12,9 +12,14 @@
   height: 85px;
   background-image: url('./assets/doodler-guy.png');
   position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  /*transition: transform 0.05s linear;*/
+
   /* bottom: 100px; */
-  bottom: 0px;
-  left: 100px;
+  /*bottom: 0px;*/
+  /*left: 100px;*/
 }
 
 .platform {

@@ -10,7 +10,7 @@ export default class PlatformSystem {
   init() {
     for (let i = 0; i < 10; i++) {
       const x = randomRange(40, 320);
-      const y = 600 - i * this.spacing;
+      const y = 600 - i * 80;
       this.state.platforms.push(new Platform(x, y));
     }
   }

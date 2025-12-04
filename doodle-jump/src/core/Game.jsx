@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Platforms from './Platforms';
 
 const ACCELERATION = 1600; // px/s²
@@ -7,11 +7,15 @@ const FRICTION = 0.92; // multiplies velocity per frame
 const PLATFORM_HEIGHT = 15;
 const PLATFORM_WIDTH = 80;
 
+const OUT_OF_BOUNDS_HEIGHT = 650;
+
+const SCROLL_THRESHOLD = 220; // px
+
 const doodWidth = 87;
 const doodHeight = 85;
 
-const Game = ({ setIsGameOver }) => {
-	let direction = 1; // Right
+const Game = ({ setIsGameOver, resetGame, setResetGame }) => {
+	const [tick, setTick] = useState(0);
 
 	const platformRef = useRef([
 		{ x: 155, y: 480, width: PLATFORM_WIDTH },
@@ -24,13 +28,11 @@ const Game = ({ setIsGameOver }) => {
 		y: 150,
 		velocityX: 0,
 		velocityY: 0,
-		minHeight: 300,
-		maxHeight: 100,
-
 		jumpStrength: -550, // A greater negative number will make dood jump higher
 		gravity: 900, // Decreasing gravity will make dood jump higher and fall slower
-
 		horizontalSpeed: 240, // pixels per second
+		yPrev: 150,
+		direction: 1, // Right
 	});
 
 	const inputRef = useRef({
@@ -64,40 +66,29 @@ const Game = ({ setIsGameOver }) => {
 
 	function moveVertically(dood, dt) {
 		// --- Vertical movement ---
+		dood.yPrev = dood.y; // at the very start of moveVertically()
+
 		dood.velocityY += dood.gravity * dt;
 		dood.y += dood.velocityY * dt;
 
 		// --- Platform collisions (only when falling) ---
 		if (dood.velocityY > 0) {
 			for (const p of platformRef.current) {
-				const withinX = dood.x + doodWidth > p.x && dood.x < p.x + p.width;
-
-				// console.log('withinX', withinX);
-				// console.log('dood.x + doodWidth > p.x', dood.x + doodWidth > p.x);
-				// console.log('dood.x < p.x + p.width', dood.x < p.x + p.width);
-				// console.log('dood.x ', dood.x); // 157
-				// console.log('p.x ', p.x);
-				// console.log('p.width ', p.width);
-
-				// Where dood’s feet are
-				const feetY = dood.y + doodHeight;
-				// console.log('feetY', feetY);
-				// console.log('p.y', p.y);
-
 				// Vertical overlap (touching the top surface)
-				const tolerance = 5; // 5px tolerance
+				// const tolerance = 5; // 5px tolerance
+
+				const previousFeetY = dood.yPrev + doodHeight;
+				const currentFeetY = dood.y + doodHeight;
+
+				// Instead of just checking dood's feet position (feetY) against p.y at the current frame, check if dood passes through the platform between the previous and current frame. This prevents missed collisions, which can happen when dood’s vertical velocity is high enough that, in a single frame, his feet move from above the platform to below it, without your collision check ever triggering.
 				const touching =
-					feetY >= p.y - tolerance &&
-					feetY <= p.y + tolerance &&
-					dood.velocityY > 0;
+					dood.velocityY > 0 && // only when falling
+					currentFeetY >= p.y && // currently below or at platform
+					previousFeetY <= p.y && // was above platform last frame
+					dood.x + doodWidth > p.x && // horizontal overlap
+					dood.x < p.x + p.width;
 
-				console.log('touching', touching);
-				// console.log('feetY >= p.y', feetY >= p.y);
-				// console.log('feetY <= p.y + 10', feetY <= p.y + 10);
-				// console.log('withinX && touching', withinX, touching);
-
-				if (withinX && touching) {
-					// console.log('withinX && touching', withinX, touching);
+				if (touching) {
 					// Place dood exactly on top of the platform
 					dood.y = p.y - doodHeight;
 
@@ -107,16 +98,30 @@ const Game = ({ setIsGameOver }) => {
 			}
 		}
 
-		// Switch direction at limits
-		// if (dood.y > dood.minHeight) {
-		// 	// endGame();
-		// 	// dood.y = 650; // stop dood moving
-		// 	dood.velocityY = dood.jumpStrength; // bounce upward
-		// }
+		// Check if dood fell off the bottom
+		if (dood.y > OUT_OF_BOUNDS_HEIGHT) {
+			endGame();
+			dood.y = 650; // stop dood moving
+			// dood.velocityY = dood.jumpStrength; // bounce upward
+		}
 
 		// if (dood.y < dood.maxHeight) {
 		// 	dood.velocityY = dood.gravity * 0.1; // start falling
 		// }
+
+		if (dood.y < SCROLL_THRESHOLD) {
+			console.log('ABOVE THRESHOLD OF', SCROLL_THRESHOLD);
+			const shift = SCROLL_THRESHOLD - dood.y; // how much dood has moved above threshold
+			console.log('shift', shift);
+			dood.y = SCROLL_THRESHOLD; // keep doodler at threshold
+
+			// Move all platforms down by the same amount
+			platformRef.current.forEach((p) => {
+				p.y += shift;
+			});
+
+			setTick((t) => t + 1); // triggers a re-render
+		}
 	}
 
 	function moveHorizontally(dood, dt, input) {
@@ -163,11 +168,32 @@ const Game = ({ setIsGameOver }) => {
 		const dood = doodRef.current;
 		const doodElem = document.getElementById('dood');
 
-		if (input.right) direction = 1;
-		if (input.left) direction = -1;
+		if (input.right) dood.direction = 1;
+		if (input.left) dood.direction = -1;
 
-		doodElem.style.transform = `translate(${dood.x}px, ${dood.y}px) scaleX(${direction})`;
+		doodElem.style.transform = `translate(${dood.x}px, ${dood.y}px) scaleX(${dood.direction})`;
+
+		// Remove platforms that have gone off the bottom of the screen
+		platformRef.current = platformRef.current.filter((p) => p.y < 600);
+
+		// Add new platform at top
+		if (platformRef.current.length < 6) {
+			const newPlatform = {
+				x: randomRange(30, 370),
+				// y: 0,
+				y: randomRange(-35, -15),
+				width: PLATFORM_WIDTH,
+				height: PLATFORM_HEIGHT,
+			};
+			platformRef.current.push(newPlatform);
+		}
+
+		setTick((t) => t + 1); // triggers a re-render
 	};
+
+	// function runGameLoop() {
+	// 	drawnInitialPlatforms = false;
+	// }
 
 	useEffect(() => {
 		let frameId;
@@ -210,6 +236,85 @@ const Game = ({ setIsGameOver }) => {
 			window.removeEventListener('keyup', handleKeyUp);
 		};
 	}, []);
+
+	function randomRange(min, max) {
+		return Math.random() * (max - min) + min;
+	}
+
+	// generate a random number between 30 and 130 or between 250 and 370. This is the range either side of dood
+	function randomFromTwoRanges() {
+		// Pick which range: 0 = first, 1 = second
+		const rangeChoice = Math.random() < 0.5 ? 0 : 1;
+		// const rangeChoice = 0;
+
+		if (rangeChoice === 0) {
+			// First range: 30–130
+			return Math.random() * (50 - 30) + 30;
+		} else {
+			// Second range: 250–370
+			return Math.random() * (295 - 265) + 265;
+		}
+	}
+
+	let drawnInitialPlatforms = false;
+
+	useEffect(() => {
+		if (!drawnInitialPlatforms) {
+			const xPositionNotInLineWithDood = randomFromTwoRanges();
+			// console.log('xPositionNotInLineWithDood', xPositionNotInLineWithDood);
+
+			const p3 = {
+				x: xPositionNotInLineWithDood,
+				// x: 295,
+				y: 250,
+				width: PLATFORM_WIDTH,
+				height: PLATFORM_HEIGHT,
+			};
+
+			const p4 = {
+				x: randomRange(40, 320),
+				y: 600 - 6 * 80,
+				width: PLATFORM_WIDTH,
+				height: PLATFORM_HEIGHT,
+			};
+
+			const p5 = {
+				x: randomRange(30, 370),
+				y: randomRange(20, 40),
+				width: PLATFORM_WIDTH,
+				height: PLATFORM_HEIGHT,
+			};
+
+			platformRef.current.push(p3);
+			platformRef.current.push(p4);
+			platformRef.current.push(p5);
+
+			// console.log('platformRef.current ', platformRef.current);
+
+			setTick((t) => t + 1); // triggers a re-render
+		}
+
+		drawnInitialPlatforms = true;
+	}, []);
+
+	useEffect(() => {
+		if (!resetGame) return;
+
+		// Reset dood position
+		doodRef.current.x = 157;
+		doodRef.current.y = 150;
+		doodRef.current.velocityX = 0;
+		doodRef.current.velocityY = 0;
+		doodRef.current.yPrev = 150;
+		doodRef.current.direction = 1;
+
+		const doodElem = document.getElementById('dood');
+		doodElem.style.transform = `translate(0px, 0px) scaleX(1)`;
+
+		// Reset platforms
+
+		setResetGame(false);
+	}, [resetGame]);
 
 	return (
 		<>

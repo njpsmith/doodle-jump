@@ -4,8 +4,10 @@ import Platforms from './Platforms';
 const ACCELERATION = 1600; // px/s²
 const FRICTION = 0.92; // multiplies velocity per frame
 
-const PLATFORM_HEIGHT = 15;
-const PLATFORM_WIDTH = 80;
+// const PLATFORM_HEIGHT = 15;
+// const PLATFORM_WIDTH = 80 ;
+const PLATFORM_HEIGHT = 11;
+const PLATFORM_WIDTH = 60;
 
 const OUT_OF_BOUNDS_HEIGHT = 650;
 
@@ -13,12 +15,15 @@ const SCROLL_THRESHOLD = 220; // px
 
 // const DOOD_WIDTH = 87;
 // const DOOD_HEIGHT = 85;
-const DOOD_WIDTH = 50;
-const DOOD_HEIGHT = 50;
+const DOOD_WIDTH = 60;
+const DOOD_HEIGHT = 60;
+// const DOOD_WIDTH = 50; // ball
+// const DOOD_HEIGHT = 50;
 
 const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
 	const [tick, setTick] = useState(0);
 	const [isSquished, setIsSquished] = useState(false);
+	const [maxHeight, setMaxHeight] = useState(0);
 
 	const platformRef = useRef([
 		{ x: 155, y: 480, width: PLATFORM_WIDTH },
@@ -101,7 +106,8 @@ const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
 					dood.velocityY = dood.jumpStrength;
 
 					// setScore(Math.max(prev, Math.floor(-p.y / 10)));
-					setScore((prev) => prev + 10);
+					// setScore((prev) => prev + 10);
+					// setMaxHeight();
 
 					setIsSquished(true);
 
@@ -160,8 +166,8 @@ const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
 			dood.x = 0;
 			dood.velocityX = 0;
 		}
-		if (dood.x > 400 - 87) {
-			dood.x = 400 - 87; // 400 = grid width, 87 = dood width
+		if (dood.x > 400 - DOOD_WIDTH) {
+			dood.x = 400 - DOOD_WIDTH; // 400 = grid width
 			dood.velocityX = 0;
 		}
 	}
@@ -332,11 +338,11 @@ const Game = ({ setIsGameOver, resetGame, setResetGame, setScore }) => {
 	return (
 		<>
 			<Platforms doodRef={doodRef} platformRef={platformRef} />
-			{/*<div id="dood" className="doodler"></div>*/}
+			{<div id="dood" className="doodler"></div>}
 
-			<div id="dood" className="doodler">
+			{/*<div id="dood" className="doodler">
 				<div className={`ball ${isSquished ? 'squish' : ''}`}></div>
-			</div>
+			</div>*/}
 		</>
 	);
 };

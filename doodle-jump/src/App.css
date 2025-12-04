@@ -9,23 +9,28 @@
 }
 
 .doodler {
-  /*width: 87px;*/
-  /*width: 85px;*/
-  height: 85px;
-  /*background-image: url('./assets/doodler-guy.png');*/
+  /*width: 87px;
+  height: 85px;*/
+  width: 60px;
+  height: 60px;
+  background-image: url('./assets/doodler-guy.png');
+  background-size: cover;
   position: absolute;
   left: 0;
   top: 0;
   z-index: 1;
 
-  width: 50px;
-  height: 50px;
+  /*width: 50px;*/
+  /*height: 50px;*/
 }
 
 .platform {
-  width: 85px;
-  height: 15px;
+  /*width: 85px;*/
+  width: 60px;
+  /*height: 15px;*/
+  height: 11px;
   background-image: url('./assets/platform.png');
+  background-size: contain;
   position: absolute;
 }
 
@@ -58,15 +63,7 @@ button:focus {
   outline: 0;
 }
 
-.ball {
-  /*  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
-*/
-  /*  width: 50px;
-  height: 50px;
-*/
+/*.ball {
   background: #ff5733;
   border-radius: 50%;
   transform-origin: bottom center;
@@ -78,7 +75,7 @@ button:focus {
 
 .ball.squish {
   transform: scaleX(1.3) scaleY(0.7);
-}
+}*/
 
 .score {
   position: absolute;

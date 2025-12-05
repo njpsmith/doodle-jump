@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Game from './core/Game';
 import SplashScreen from './core/SplashScreen';
+import Leaderboard from './core/Leaderboard';
 
 import './App.css';
 
@@ -11,34 +12,46 @@ function App() {
   const [resetGame, setResetGame] = useState(false);
 
   const [score, setScore] = useState(0);
-  const [highScores, setHighScores] = useState([
-    { score: 0, name: 'plumpas' },
-    { score: 99, name: 'jack' },
-  ]);
+  const [highScores, setHighScores] = useState([]);
+
+  const [playerName, setPlayerName] = useState('');
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
 
   function restartGame() {
     setIsGameOver(false);
     setResetGame(true);
   }
 
-  useEffect(() => {
-    // Add the score to the leaderboard if it is greater than any of the existing scores
-    const addToLeaderboard = highScores.some((savedScore) => {
-      return score > savedScore.score;
+  function qualifiesForHighScore(score, highScores) {
+    // Only scores that are > 0 qualify, or scores that are greater than any of the top 3 currently recorded
+    return (
+      (highScores.length < 2 && score > 0) ||
+      highScores.some((s) => score > s.score)
+    );
+  }
+
+  function handleSubmitName(e) {
+    e.preventDefault();
+
+    const newEntry = { score, name: playerName };
+
+    setHighScores((prev) => {
+      const updated = [...prev, newEntry]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3); // keep top 3
+
+      return updated;
     });
 
-    if (addToLeaderboard) {
-      const updatedScores = [...highScores, { score: score, name: 'newboy' }];
-      const sortedScores = updatedScores.sort((a, b) => b.score - a.score);
+    // hide prompt
+    setShowNamePrompt(false);
+  }
 
-      let filteredScores = sortedScores;
-
-      if (highScores.length > 3) {
-        // Only keep top 5 high scores
-        filteredScores.pop();
-      }
-
-      setHighScores(filteredScores);
+  useEffect(() => {
+    if (isGameOver) {
+      // Add the score to the leaderboard if it is greater than any of the existing scores
+      const doesQualify = qualifiesForHighScore(score, highScores);
+      setShowNamePrompt(doesQualify);
     }
   }, [isGameOver]);
 
@@ -62,11 +75,30 @@ function App() {
             score={score}
           />
 
+          {showNamePrompt && (
+            <div className="name-entry">
+              <form onSubmit={handleSubmitName}>
+                <label htmlFor="scorename">
+                  You made the leaderboard! Enter your name
+                </label>
+                <input
+                  id="scorename"
+                  name="scorename"
+                  type="text"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  placeholder="Enter your name"
+                />
+                <button type="submit">Save Score</button>
+              </form>
+            </div>
+          )}
+
           {isGameOver && (
             <div className="game-over">
               <div>GAME OVER</div>
               <button onClick={restartGame}>Restart</button>
-              {/*<div className="high-score">High score: {highScores}</div>*/}
+              <Leaderboard highScores={highScores} />
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
 import { isMobile } from '../utils';
+import Leaderboard from './Leaderboard';
 
 const SplashScreen = ({ setStartGame, startGame, highScores }) => {
 	const isDeviceMobile = isMobile();
@@ -10,16 +11,7 @@ const SplashScreen = ({ setStartGame, startGame, highScores }) => {
 
 			<button onClick={setStartGame}>Play</button>
 
-			<div className="high-score">
-				High scores:
-				<ol>
-					{highScores.map((score, i) => (
-						<li key={i}>
-							{score.name}: {score.score}
-						</li>
-					))}
-				</ol>
-			</div>
+			<Leaderboard highScores={highScores} />
 
 			{isDeviceMobile && (
 				<button

@@ -129,7 +129,12 @@ h2 {
   font-size: 20px;
   font-weight: bold;
   background: white;
-  padding: 4px 10px;
+  padding: 10px 10px;
   border-radius: 6px;
   line-height: 1.5;
+  text-align: left;
+}
+
+.high-score ol {
+  margin-bottom: 0;
 }

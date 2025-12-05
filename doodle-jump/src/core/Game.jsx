@@ -4,7 +4,8 @@ import { useTiltControl } from './TiltControls';
 import { isMobile } from '../utils';
 import { defaultPlatforms } from '../constants';
 import { randomFromTwoRanges, randomRange } from '../utils';
-// console.log('defaultPlatforms', defaultPlatforms);
+import jumpSound from '../assets/sounds/jump.mp3';
+
 // const tilt = useTiltControl();
 
 const ACCELERATION = 1600; // px/s²
@@ -130,6 +131,15 @@ const Game = ({
 	// 	};
 	// }, []); // Empty dependency array → runs once on mount and cleanup on unmount
 
+	const playJumpSound = () => {
+		// Play music. Sound from https://uppbeat.io/
+		const audio = document.getElementById('jumpSound');
+		audio.currentTime = 0;
+		audio.play().catch((err) => {
+			console.warn('Audio play failed:', err);
+		});
+	};
+
 	function moveVertically(dood, dt) {
 		// --- Vertical movement ---
 		dood.yPrev = dood.y; // at the very start of moveVertically()
@@ -160,6 +170,8 @@ const Game = ({
 
 					// Bounce
 					dood.velocityY = dood.jumpStrength;
+
+					playJumpSound();
 
 					// Scoring
 					if (p.touched) return;
@@ -425,6 +437,10 @@ const Game = ({
 		<>
 			<Platforms platformRef={platformRef} />
 			{<div id="dood" className="doodler"></div>}
+
+			<audio id="jumpSound">
+				<source src={jumpSound} type="audio/mpeg" />
+			</audio>
 		</>
 	);
 };

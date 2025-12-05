@@ -1,5 +1,4 @@
 const Leaderboard = ({ highScores }) => {
-	console.log('highScores.length', highScores.length);
 	if (highScores.length === 0) return;
 
 	return (

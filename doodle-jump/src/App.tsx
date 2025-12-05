@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Game from './core/Game';
 import SplashScreen from './core/SplashScreen';
 import Leaderboard from './core/Leaderboard';
+import fallSound from './assets/sounds/fall.mp3';
 
 import './App.css';
 
@@ -30,6 +31,15 @@ function App() {
     );
   }
 
+  const playFallSound = () => {
+    // Play music. Sound from https://sound-effects.bbcrewind.co.uk/
+    const audio = document.getElementById('fallSound');
+    audio.currentTime = 0;
+    audio.play().catch((err) => {
+      console.warn('Audio play failed:', err);
+    });
+  };
+
   function handleSubmitName(e) {
     e.preventDefault();
 
@@ -49,6 +59,8 @@ function App() {
 
   useEffect(() => {
     if (isGameOver) {
+      playFallSound();
+
       // Add the score to the leaderboard if it is greater than any of the existing scores
       const doesQualify = qualifiesForHighScore(score, highScores);
       setShowNamePrompt(doesQualify);
@@ -102,6 +114,10 @@ function App() {
             </div>
           )}
         </div>
+
+        <audio id="fallSound">
+          <source src={fallSound} type="audio/mpeg" />
+        </audio>
       </div>
     </>
   );

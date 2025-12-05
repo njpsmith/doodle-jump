@@ -43,6 +43,7 @@ function App() {
             setScore={setScore}
             score={score}
           />
+
           {isGameOver && (
             <div className="game-over">
               <div>GAME OVER</div>

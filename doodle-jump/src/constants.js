@@ -1,25 +1,9 @@
+import { randomFromTwoRanges, randomRange } from './utils';
+
 const PLATFORM_HEIGHT = 11;
 const PLATFORM_WIDTH = 60;
 
 const xPositionNotInLineWithDood = randomFromTwoRanges();
-
-function randomFromTwoRanges() {
-	// Pick which range: 0 = first, 1 = second
-	const rangeChoice = Math.random() < 0.5 ? 0 : 1;
-	// const rangeChoice = 0;
-
-	if (rangeChoice === 0) {
-		// First range: 30–130
-		return Math.random() * (50 - 30) + 30;
-	} else {
-		// Second range: 250–370
-		return Math.random() * (295 - 265) + 265;
-	}
-}
-
-function randomRange(min, max) {
-	return Math.random() * (max - min) + min;
-}
 
 export const defaultPlatforms = [
 	{ x: 155, y: 480, width: PLATFORM_WIDTH, touched: false },

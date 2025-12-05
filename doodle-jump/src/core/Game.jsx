@@ -3,6 +3,7 @@ import Platforms from './Platforms';
 import { useTiltControl } from './TiltControls';
 import { isMobile } from '../utils';
 import { defaultPlatforms } from '../constants';
+import { randomFromTwoRanges, randomRange } from '../utils';
 // console.log('defaultPlatforms', defaultPlatforms);
 // const tilt = useTiltControl();
 
@@ -32,8 +33,9 @@ const Game = ({
 	setResetGame,
 	setScore,
 	score,
+	// isGameOver,
 }) => {
-	// let isGameOver = false; // delete
+	let isGameOver = false;
 
 	// const [platforms, setPlatforms] = useState(defaultPlatforms);
 
@@ -45,11 +47,11 @@ const Game = ({
 	// const [platformsKey, setPlatformsKey] = useState(0);
 
 	function resetPlatforms() {
-		console.log('CALLING resetPlatforms');
+		// console.log('CALLING resetPlatforms');
 		platformRef.current = [...defaultPlatforms];
 
 		platformRef.current.forEach((p, i) => {
-			console.log('i', i);
+			// console.log('i', i);
 			const elem = document.getElementById(`platform-${i}`);
 			elem.style.top = `${p.y}px`;
 			elem.style.left = `${p.x}px`;
@@ -110,13 +112,23 @@ const Game = ({
 
 	function endGame() {
 		setIsGameOver(true);
-		// isGameOver = true;
+		isGameOver = true;
 
 		// platformRef.current = [];
 
 		// setPlatformsKey((k) => k + 1); // forces Platforms to remount
 		// console.log('platformRef.current', platformRef.current);
 	}
+
+	// useEffect(() => {
+	// 	// Code here runs when the component mounts
+	// 	console.log('Mounted isGameOver', isGameOver);
+
+	// 	return () => {
+	// 		// Cleanup code runs when the component unmounts
+	// 		console.log('Unmounted isGameOver', isGameOver);
+	// 	};
+	// }, []); // Empty dependency array → runs once on mount and cleanup on unmount
 
 	function moveVertically(dood, dt) {
 		// --- Vertical movement ---
@@ -361,24 +373,20 @@ const Game = ({
 		}
 	}, []);
 
-	function randomRange(min, max) {
-		return Math.random() * (max - min) + min;
-	}
-
 	// generate a random number between 30 and 130 or between 250 and 370. This is the range either side of dood
-	function randomFromTwoRanges() {
-		// Pick which range: 0 = first, 1 = second
-		const rangeChoice = Math.random() < 0.5 ? 0 : 1;
-		// const rangeChoice = 0;
+	// function randomFromTwoRanges() {
+	// 	// Pick which range: 0 = first, 1 = second
+	// 	const rangeChoice = Math.random() < 0.5 ? 0 : 1;
+	// 	// const rangeChoice = 0;
 
-		if (rangeChoice === 0) {
-			// First range: 30–130
-			return Math.random() * (50 - 30) + 30;
-		} else {
-			// Second range: 250–370
-			return Math.random() * (295 - 265) + 265;
-		}
-	}
+	// 	if (rangeChoice === 0) {
+	// 		// First range: 30–130
+	// 		return Math.random() * (50 - 30) + 30;
+	// 	} else {
+	// 		// Second range: 250–370
+	// 		return Math.random() * (295 - 265) + 265;
+	// 	}
+	// }
 
 	// DELETE THIS?
 	let initialRenderTriggered = false;
@@ -392,9 +400,10 @@ const Game = ({
 	useEffect(() => {
 		if (!resetGame) return;
 
-		// isGameOver = false;
+		isGameOver = false;
+		// console.log('resetting game. isGameOver:', isGameOver);
 
-		resetPlatforms();
+		// resetPlatforms();
 
 		// Reset dood position
 		doodRef.current.x = 157;

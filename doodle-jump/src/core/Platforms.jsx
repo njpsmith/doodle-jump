@@ -1,13 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { randomRange } from '../utils';
 
 const PLATFORM_HEIGHT = 15;
 const PLATFORM_WIDTH = 80;
 
 const Platforms = ({ platformRef }) => {
-	function randomRange(min, max) {
-		return Math.random() * (max - min) + min;
-	}
-
 	return (
 		<>
 			{platformRef.current.map((p, i) => (

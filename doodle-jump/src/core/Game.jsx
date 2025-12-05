@@ -31,9 +31,30 @@ const Game = ({
 	const [tick, setTick] = useState(0);
 	// const [isSquished, setIsSquished] = useState(false);
 
+	const xPositionNotInLineWithDood = randomFromTwoRanges();
 	const platformRef = useRef([
 		{ x: 155, y: 480, width: PLATFORM_WIDTH, touched: false },
 		{ x: 250, y: 350, width: PLATFORM_WIDTH, touched: false },
+		{
+			x: xPositionNotInLineWithDood,
+			y: 250,
+			width: PLATFORM_WIDTH,
+			height: PLATFORM_HEIGHT,
+			touched: false,
+		},
+		{
+			x: randomRange(40, 320),
+			y: 600 - 6 * 80,
+			width: PLATFORM_WIDTH,
+			height: PLATFORM_HEIGHT,
+			touched: false,
+		},
+		{
+			x: randomRange(30, 370),
+			y: randomRange(20, 40),
+			width: PLATFORM_WIDTH,
+			height: PLATFORM_HEIGHT,
+		},
 	]);
 
 	const lastTimeRef = useRef(performance.now());
@@ -291,36 +312,36 @@ const Game = ({
 
 	useEffect(() => {
 		if (!drawnInitialPlatforms) {
-			const xPositionNotInLineWithDood = randomFromTwoRanges();
-			// console.log('xPositionNotInLineWithDood', xPositionNotInLineWithDood);
+			// const xPositionNotInLineWithDood = randomFromTwoRanges();
+			// // console.log('xPositionNotInLineWithDood', xPositionNotInLineWithDood);
 
-			const p3 = {
-				x: xPositionNotInLineWithDood,
-				// x: 295,
-				y: 250,
-				width: PLATFORM_WIDTH,
-				height: PLATFORM_HEIGHT,
-				touched: false,
-			};
+			// const p3 = {
+			// 	x: xPositionNotInLineWithDood,
+			// 	// x: 295,
+			// 	y: 250,
+			// 	width: PLATFORM_WIDTH,
+			// 	height: PLATFORM_HEIGHT,
+			// 	touched: false,
+			// };
 
-			const p4 = {
-				x: randomRange(40, 320),
-				y: 600 - 6 * 80,
-				width: PLATFORM_WIDTH,
-				height: PLATFORM_HEIGHT,
-				touched: false,
-			};
+			// const p4 = {
+			// 	x: randomRange(40, 320),
+			// 	y: 600 - 6 * 80,
+			// 	width: PLATFORM_WIDTH,
+			// 	height: PLATFORM_HEIGHT,
+			// 	touched: false,
+			// };
 
-			const p5 = {
-				x: randomRange(30, 370),
-				y: randomRange(20, 40),
-				width: PLATFORM_WIDTH,
-				height: PLATFORM_HEIGHT,
-			};
+			// const p5 = {
+			// 	x: randomRange(30, 370),
+			// 	y: randomRange(20, 40),
+			// 	width: PLATFORM_WIDTH,
+			// 	height: PLATFORM_HEIGHT,
+			// };
 
-			platformRef.current.push(p3);
-			platformRef.current.push(p4);
-			platformRef.current.push(p5);
+			// platformRef.current.push(p3);
+			// platformRef.current.push(p4);
+			// platformRef.current.push(p5);
 
 			// console.log('platformRef.current ', platformRef.current);
 

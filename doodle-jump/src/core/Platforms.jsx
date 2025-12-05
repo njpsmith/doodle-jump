@@ -12,7 +12,8 @@ const Platforms = ({ platformRef }) => {
 		<>
 			{platformRef.current.map((p, i) => (
 				<div
-					key={i}
+					key={`${i}-${p.y}`}
+					id={`platform-${i}`}
 					className="platform"
 					style={{
 						left: `${p.x}px`,

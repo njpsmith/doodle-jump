@@ -37,6 +37,7 @@ function App() {
           <Game
             startGame={startGame}
             setIsGameOver={setIsGameOver}
+            isGameOver={isGameOver}
             resetGame={resetGame}
             setResetGame={setResetGame}
             setScore={setScore}

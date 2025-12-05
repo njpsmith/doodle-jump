@@ -3,7 +3,7 @@ import Platforms from './Platforms';
 import { useTiltControl } from './TiltControls';
 import { isMobile } from '../utils';
 import { defaultPlatforms } from '../constants';
-console.log('defaultPlatforms', defaultPlatforms);
+// console.log('defaultPlatforms', defaultPlatforms);
 // const tilt = useTiltControl();
 
 const ACCELERATION = 1600; // px/s²
@@ -33,15 +33,34 @@ const Game = ({
 	setScore,
 	score,
 }) => {
+	// let isGameOver = false; // delete
+
+	// const [platforms, setPlatforms] = useState(defaultPlatforms);
+
 	const [tick, setTick] = useState(0);
 
 	const xPositionNotInLineWithDood = randomFromTwoRanges();
 	const platformRef = useRef(defaultPlatforms);
 
+	// const [platformsKey, setPlatformsKey] = useState(0);
+
 	function resetPlatforms() {
-		console.log('resetPlatforms');
-		// FIX THISSSSS
+		console.log('CALLING resetPlatforms');
 		platformRef.current = [...defaultPlatforms];
+
+		platformRef.current.forEach((p, i) => {
+			console.log('i', i);
+			const elem = document.getElementById(`platform-${i}`);
+			elem.style.top = `${p.y}px`;
+			elem.style.left = `${p.x}px`;
+		});
+
+		// console.log('resetPlatforms', platformRef.current);
+		// setPlatforms([...defaultPlatforms]);
+
+		// setPlatformsKey((k) => k + 1); // forces Platforms to remount
+
+		// setTick((t) => t + 1); // triggers a re-render
 	}
 
 	const lastTimeRef = useRef(performance.now());
@@ -91,6 +110,12 @@ const Game = ({
 
 	function endGame() {
 		setIsGameOver(true);
+		// isGameOver = true;
+
+		// platformRef.current = [];
+
+		// setPlatformsKey((k) => k + 1); // forces Platforms to remount
+		// console.log('platformRef.current', platformRef.current);
 	}
 
 	function moveVertically(dood, dt) {
@@ -201,7 +226,6 @@ const Game = ({
 		const input = inputRef.current;
 
 		moveHorizontally(dood, dt, input);
-
 		moveVertically(dood, dt);
 	};
 
@@ -215,11 +239,18 @@ const Game = ({
 
 		doodElem.style.transform = `translate(${dood.x}px, ${dood.y}px) scaleX(${dood.direction})`;
 
+		// if (!isGameOver) {
+		// console.log('draw', isGameOver);
 		// Remove platforms that have gone off the bottom of the screen
 		platformRef.current = platformRef.current.filter((p) => p.y < 600);
 		generateNewPlatforms();
 
 		setTick((t) => t + 1); // triggers a re-render
+		// } else {
+		// console.log('reseting plumpas');
+		// Game is over - Reset platforms
+		// resetPlatforms();
+		// }
 	};
 
 	function generateNewPlatforms() {
@@ -349,16 +380,21 @@ const Game = ({
 		}
 	}
 
-	let drawnInitialPlatforms = false;
+	// DELETE THIS?
+	let initialRenderTriggered = false;
 	useEffect(() => {
-		if (!drawnInitialPlatforms) {
+		if (!initialRenderTriggered) {
 			setTick((t) => t + 1); // triggers a re-render
 		}
-		drawnInitialPlatforms = true;
+		initialRenderTriggered = true;
 	}, []);
 
 	useEffect(() => {
 		if (!resetGame) return;
+
+		// isGameOver = false;
+
+		resetPlatforms();
 
 		// Reset dood position
 		doodRef.current.x = 157;
@@ -372,9 +408,6 @@ const Game = ({
 		doodElem.style.transform = `translate(0px, 0px) scaleX(1)`;
 
 		setScore(0);
-
-		// Reset platforms
-		resetPlatforms();
 
 		setResetGame(false);
 	}, [resetGame]);

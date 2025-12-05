@@ -1,3 +1,17 @@
+# Commands
+
+To run locally:
+
+```
+npm run dev
+```
+
+To build:
+
+```
+npm run build
+```
+
 # Modules / Files
 
 1. index.html – Canvas or DOM container

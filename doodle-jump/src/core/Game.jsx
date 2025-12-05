@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import Platforms from './Platforms';
 import { useTiltControl } from './TiltControls';
 import { isMobile } from '../utils';
-
+import { defaultPlatforms } from '../constants';
+console.log('defaultPlatforms', defaultPlatforms);
 // const tilt = useTiltControl();
 
 const ACCELERATION = 1600; // px/s²
@@ -35,52 +36,13 @@ const Game = ({
 	const [tick, setTick] = useState(0);
 
 	const xPositionNotInLineWithDood = randomFromTwoRanges();
-	const platformRef = useRef([
-		{ x: 155, y: 480, width: PLATFORM_WIDTH, touched: false },
-		{ x: 60, y: 400, width: PLATFORM_WIDTH, touched: false },
-		{ x: 250, y: 350, width: PLATFORM_WIDTH, touched: false },
-		{ x: 310, y: 300, width: PLATFORM_WIDTH, touched: false },
-		{
-			x: xPositionNotInLineWithDood,
-			y: 250,
-			width: PLATFORM_WIDTH,
-			height: PLATFORM_HEIGHT,
-			touched: false,
-		},
-		{
-			x: randomRange(40, 320),
-			y: 200,
-			width: PLATFORM_WIDTH,
-			height: PLATFORM_HEIGHT,
-			touched: false,
-		},
-		{
-			x: randomRange(40, 320),
-			y: randomRange(135, 140),
-			width: PLATFORM_WIDTH,
-			height: PLATFORM_HEIGHT,
-			touched: false,
-		},
-		{
-			x: randomRange(40, 320),
-			y: randomRange(90, 100),
-			width: PLATFORM_WIDTH,
-			height: PLATFORM_HEIGHT,
-			touched: false,
-		},
-		{
-			x: randomRange(30, 370),
-			y: randomRange(25, 40),
-			width: PLATFORM_WIDTH,
-			height: PLATFORM_HEIGHT,
-		},
-		{
-			x: randomRange(30, 370),
-			y: randomRange(5, 10),
-			width: PLATFORM_WIDTH,
-			height: PLATFORM_HEIGHT,
-		},
-	]);
+	const platformRef = useRef(defaultPlatforms);
+
+	function resetPlatforms() {
+		console.log('resetPlatforms');
+		// FIX THISSSSS
+		platformRef.current = [...defaultPlatforms];
+	}
 
 	const lastTimeRef = useRef(performance.now());
 	const doodRef = useRef({
@@ -412,6 +374,7 @@ const Game = ({
 		setScore(0);
 
 		// Reset platforms
+		resetPlatforms();
 
 		setResetGame(false);
 	}, [resetGame]);

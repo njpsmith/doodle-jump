@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Platforms from './Platforms';
+import { useTiltControl } from './TiltControls';
+import { isMobile } from '../utils';
+
+// const tilt = useTiltControl();
 
 const ACCELERATION = 1600; // px/s²
 const FRICTION = 0.92; // multiplies velocity per frame
@@ -21,20 +25,21 @@ const DOOD_HEIGHT = 60;
 // const DOOD_HEIGHT = 50;
 
 const Game = ({
+	startGame,
 	setIsGameOver,
 	resetGame,
 	setResetGame,
 	setScore,
-	// setMaxHeight,
-	// maxHeight,
+	score,
 }) => {
 	const [tick, setTick] = useState(0);
-	// const [isSquished, setIsSquished] = useState(false);
 
 	const xPositionNotInLineWithDood = randomFromTwoRanges();
 	const platformRef = useRef([
 		{ x: 155, y: 480, width: PLATFORM_WIDTH, touched: false },
+		{ x: 60, y: 400, width: PLATFORM_WIDTH, touched: false },
 		{ x: 250, y: 350, width: PLATFORM_WIDTH, touched: false },
+		{ x: 310, y: 300, width: PLATFORM_WIDTH, touched: false },
 		{
 			x: xPositionNotInLineWithDood,
 			y: 250,
@@ -44,14 +49,34 @@ const Game = ({
 		},
 		{
 			x: randomRange(40, 320),
-			y: 600 - 6 * 80,
+			y: 200,
+			width: PLATFORM_WIDTH,
+			height: PLATFORM_HEIGHT,
+			touched: false,
+		},
+		{
+			x: randomRange(40, 320),
+			y: randomRange(135, 140),
+			width: PLATFORM_WIDTH,
+			height: PLATFORM_HEIGHT,
+			touched: false,
+		},
+		{
+			x: randomRange(40, 320),
+			y: randomRange(90, 100),
 			width: PLATFORM_WIDTH,
 			height: PLATFORM_HEIGHT,
 			touched: false,
 		},
 		{
 			x: randomRange(30, 370),
-			y: randomRange(20, 40),
+			y: randomRange(25, 40),
+			width: PLATFORM_WIDTH,
+			height: PLATFORM_HEIGHT,
+		},
+		{
+			x: randomRange(30, 370),
+			y: randomRange(5, 10),
 			width: PLATFORM_WIDTH,
 			height: PLATFORM_HEIGHT,
 		},
@@ -74,6 +99,13 @@ const Game = ({
 		left: false,
 		right: false,
 	});
+
+	// Because we need the latest score inside a loop that is outside React's render, we must store score in a ref
+	const scoreRef = useRef(score);
+
+	useEffect(() => {
+		scoreRef.current = score;
+	}, [score]);
 
 	const run = () => {
 		let frameID;
@@ -142,10 +174,6 @@ const Game = ({
 					setScore((prev) => (prev += Math.round(platformHeightScore)));
 
 					setTick((t) => t + 1); // triggers a re-render
-
-					// setIsSquished(true);
-					// Remove squish after 150ms
-					// setTimeout(() => setIsSquished(false), 150);
 				}
 			}
 		}
@@ -227,66 +255,117 @@ const Game = ({
 
 		// Remove platforms that have gone off the bottom of the screen
 		platformRef.current = platformRef.current.filter((p) => p.y < 600);
+		generateNewPlatforms();
 
+		setTick((t) => t + 1); // triggers a re-render
+	};
+
+	function generateNewPlatforms() {
 		// Add new platform at top
-		if (platformRef.current.length < 6) {
+		if (platformRef.current.length < 10) {
+			let x;
+			let y;
+
+			// Make game more difficult as score increases
+			switch (true) {
+				case scoreRef.current > 4000:
+					x = randomRange(20, 380);
+					y = randomRange(-15, -30);
+					break;
+
+				case scoreRef.current > 200:
+					x = randomRange(25, 380);
+					y = randomRange(-10, -20);
+					break;
+
+				default:
+					x = randomRange(30, 370);
+					y = randomRange(-10, -20);
+			}
 			const newPlatform = {
-				x: randomRange(30, 370),
-				// y: 0,
-				y: randomRange(-35, -15),
+				x: x,
+				y: y,
 				width: PLATFORM_WIDTH,
 				height: PLATFORM_HEIGHT,
 			};
 			platformRef.current.push(newPlatform);
 		}
-
-		setTick((t) => t + 1); // triggers a re-render
-	};
-
-	// function runGameLoop() {
-	// 	drawnInitialPlatforms = false;
-	// }
+	}
 
 	useEffect(() => {
-		let frameId;
+		if (startGame) {
+			let frameId;
 
-		function gameLoop(time) {
-			const dt = (time - lastTimeRef.current) / 1000;
-			lastTimeRef.current = time;
+			function gameLoop(time) {
+				const dt = (time - lastTimeRef.current) / 1000;
+				lastTimeRef.current = time;
 
-			update(dt);
-			draw();
+				update(dt);
+				draw();
 
+				frameId = requestAnimationFrame(gameLoop);
+			}
 			frameId = requestAnimationFrame(gameLoop);
-		}
-		frameId = requestAnimationFrame(gameLoop);
 
-		return () => {
-			cancelAnimationFrame(frameId);
-		};
-	}, []);
+			return () => {
+				cancelAnimationFrame(frameId);
+			};
+		}
+	}, [startGame]);
 
 	// Left/Right controls
 	useEffect(() => {
-		const handleKeyDown = (e) => {
-			if (e.key === 'ArrowLeft' || e.key === 'a') inputRef.current.left = true;
-			if (e.key === 'ArrowRight' || e.key === 'd')
-				inputRef.current.right = true;
-		};
+		if (isMobile()) {
+			// Motion logic
+			function handleOrientation(e) {
+				const gamma = e.gamma || 0; // -90 (tilt left) to 90 (tilt right)
 
-		const handleKeyUp = (e) => {
-			if (e.key === 'ArrowLeft' || e.key === 'a') inputRef.current.left = false;
-			if (e.key === 'ArrowRight' || e.key === 'd')
+				// Define tilt thresholds
+				const leftThreshold = -10; // tilt left past -10° → move left
+				const rightThreshold = 10; // tilt right past 10° → move right
+
+				// Reset first
+				inputRef.current.left = false;
 				inputRef.current.right = false;
-		};
 
-		window.addEventListener('keydown', handleKeyDown);
-		window.addEventListener('keyup', handleKeyUp);
+				// Apply tilt logic
+				if (gamma < leftThreshold) {
+					inputRef.current.left = true;
+				} else if (gamma > rightThreshold) {
+					inputRef.current.right = true;
+				}
 
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown);
-			window.removeEventListener('keyup', handleKeyUp);
-		};
+				// Optional: you can expose gamma if you want analog movement speed
+				// inputRef.current.tilt = gamma;
+			}
+
+			window.addEventListener('deviceorientation', handleOrientation);
+			return () =>
+				window.removeEventListener('deviceorientation', handleOrientation);
+		} else {
+			// Desktop
+			const handleKeyDown = (e) => {
+				if (e.key === 'ArrowLeft' || e.key === 'a')
+					inputRef.current.left = true;
+				if (e.key === 'ArrowRight' || e.key === 'd')
+					inputRef.current.right = true;
+			};
+
+			const handleKeyUp = (e) => {
+				if (e.key === 'ArrowLeft' || e.key === 'a')
+					inputRef.current.left = false;
+				if (e.key === 'ArrowRight' || e.key === 'd')
+					inputRef.current.right = false;
+			};
+
+			window.addEventListener('keydown', handleKeyDown);
+			window.addEventListener('keyup', handleKeyUp);
+
+			return () => {
+				window.removeEventListener('keydown', handleKeyDown);
+				window.removeEventListener('keyup', handleKeyUp);
+			};
+		}
 	}, []);
 
 	function randomRange(min, max) {
@@ -309,45 +388,10 @@ const Game = ({
 	}
 
 	let drawnInitialPlatforms = false;
-
 	useEffect(() => {
 		if (!drawnInitialPlatforms) {
-			// const xPositionNotInLineWithDood = randomFromTwoRanges();
-			// // console.log('xPositionNotInLineWithDood', xPositionNotInLineWithDood);
-
-			// const p3 = {
-			// 	x: xPositionNotInLineWithDood,
-			// 	// x: 295,
-			// 	y: 250,
-			// 	width: PLATFORM_WIDTH,
-			// 	height: PLATFORM_HEIGHT,
-			// 	touched: false,
-			// };
-
-			// const p4 = {
-			// 	x: randomRange(40, 320),
-			// 	y: 600 - 6 * 80,
-			// 	width: PLATFORM_WIDTH,
-			// 	height: PLATFORM_HEIGHT,
-			// 	touched: false,
-			// };
-
-			// const p5 = {
-			// 	x: randomRange(30, 370),
-			// 	y: randomRange(20, 40),
-			// 	width: PLATFORM_WIDTH,
-			// 	height: PLATFORM_HEIGHT,
-			// };
-
-			// platformRef.current.push(p3);
-			// platformRef.current.push(p4);
-			// platformRef.current.push(p5);
-
-			// console.log('platformRef.current ', platformRef.current);
-
 			setTick((t) => t + 1); // triggers a re-render
 		}
-
 		drawnInitialPlatforms = true;
 	}, []);
 
@@ -365,6 +409,8 @@ const Game = ({
 		const doodElem = document.getElementById('dood');
 		doodElem.style.transform = `translate(0px, 0px) scaleX(1)`;
 
+		setScore(0);
+
 		// Reset platforms
 
 		setResetGame(false);
@@ -372,12 +418,8 @@ const Game = ({
 
 	return (
 		<>
-			<Platforms doodRef={doodRef} platformRef={platformRef} />
+			<Platforms platformRef={platformRef} />
 			{<div id="dood" className="doodler"></div>}
-
-			{/*<div id="dood" className="doodler">
-				<div className={`ball ${isSquished ? 'squish' : ''}`}></div>
-			</div>*/}
 		</>
 	);
 };

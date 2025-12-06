@@ -8,11 +8,11 @@ import jumpSound from '../assets/sounds/jump.mp3';
 
 // const tilt = useTiltControl();
 
+const GAME_WIDTH = 400;
+
 const ACCELERATION = 1600; // px/s²
 const FRICTION = 0.92; // multiplies velocity per frame
 
-// const PLATFORM_HEIGHT = 15;
-// const PLATFORM_WIDTH = 80 ;
 const PLATFORM_HEIGHT = 11;
 const PLATFORM_WIDTH = 60;
 
@@ -20,12 +20,8 @@ const OUT_OF_BOUNDS_HEIGHT = 650;
 
 const SCROLL_THRESHOLD = 220; // px
 
-// const DOOD_WIDTH = 87;
-// const DOOD_HEIGHT = 85;
 const DOOD_WIDTH = 60;
 const DOOD_HEIGHT = 60;
-// const DOOD_WIDTH = 50; // ball
-// const DOOD_HEIGHT = 50;
 
 const Game = ({
 	startGame,
@@ -234,13 +230,25 @@ const Game = ({
 		dood.x += dood.velocityX * dt;
 
 		// Optional: clamp so dood stays in the screen
-		if (dood.x < 0) {
-			dood.x = 0;
-			dood.velocityX = 0;
+		// if (dood.x < 0) {
+		// 	dood.x = 0;
+		// 	dood.velocityX = 0;
+		// }
+		// if (dood.x > 400 - DOOD_WIDTH) {
+		// 	dood.x = 400 - DOOD_WIDTH; // 400 = grid width
+		// 	dood.velocityX = 0;
+		// }
+
+		// Horizontal screen wrapping:
+		// If dood jumps off the right side of the screen, he appears on the left side, and vice-versa
+		// Right wrap
+		if (dood.x > GAME_WIDTH) {
+			dood.x = -DOOD_WIDTH;
 		}
-		if (dood.x > 400 - DOOD_WIDTH) {
-			dood.x = 400 - DOOD_WIDTH; // 400 = grid width
-			dood.velocityX = 0;
+
+		// Left wrap
+		if (dood.x < -DOOD_WIDTH) {
+			dood.x = GAME_WIDTH;
 		}
 	}
 

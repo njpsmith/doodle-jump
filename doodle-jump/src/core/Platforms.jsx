@@ -16,9 +16,7 @@ const Platforms = ({ platformRef }) => {
 						left: `${p.x}px`,
 						top: `${p.y}px`,
 					}}
-				>
-					{i}
-				</div>
+				></div>
 			))}
 		</>
 	);

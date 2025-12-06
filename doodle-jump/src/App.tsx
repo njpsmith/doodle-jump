@@ -7,8 +7,8 @@ import fallSound from './assets/sounds/fall.mp3';
 import './App.css';
 
 function App() {
-  // const [startGame, setStartGame] = useState(false);
-  const [startGame, setStartGame] = useState(true);
+  const [startGame, setStartGame] = useState(false);
+  // const [startGame, setStartGame] = useState(true);
   const [isGameOver, setIsGameOver] = useState(false);
   const [resetGame, setResetGame] = useState(false);
 

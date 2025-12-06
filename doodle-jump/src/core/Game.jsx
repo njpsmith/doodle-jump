@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Platforms from './Platforms';
-import { useTiltControl } from './TiltControls';
+// import { useTiltControl } from './TiltControls';
 import { isMobile } from '../utils';
 import { defaultPlatforms } from '../constants';
 import { randomFromTwoRanges, randomRange } from '../utils';

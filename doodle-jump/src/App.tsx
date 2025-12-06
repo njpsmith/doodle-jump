@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Game from './core/Game';
 import SplashScreen from './core/SplashScreen';
 import Leaderboard from './core/Leaderboard';
+import NameEntry from './core/NameEntry';
 import fallSound from './assets/sounds/fall.mp3';
 
 import './App.css';
@@ -16,7 +17,7 @@ function App() {
   const [highScores, setHighScores] = useState([]);
 
   const [playerName, setPlayerName] = useState('');
-  const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const [showNameEntryPrompt, setShowNameEntryPrompt] = useState(false);
 
   function restartGame() {
     setIsGameOver(false);
@@ -40,30 +41,13 @@ function App() {
     });
   };
 
-  function handleSubmitName(e) {
-    e.preventDefault();
-
-    const newEntry = { score, name: playerName };
-
-    setHighScores((prev) => {
-      const updated = [...prev, newEntry]
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 3); // keep top 3
-
-      return updated;
-    });
-
-    // hide prompt
-    setShowNamePrompt(false);
-  }
-
   useEffect(() => {
     if (isGameOver) {
       playFallSound();
 
       // Add the score to the leaderboard if it is greater than any of the existing scores
       const doesQualify = qualifiesForHighScore(score, highScores);
-      setShowNamePrompt(doesQualify);
+      setShowNameEntryPrompt(doesQualify);
     }
   }, [isGameOver]);
 
@@ -87,23 +71,14 @@ function App() {
             score={score}
           />
 
-          {showNamePrompt && (
-            <div className="name-entry">
-              <form onSubmit={handleSubmitName}>
-                <label htmlFor="scorename">
-                  You made the leaderboard! Enter your name
-                </label>
-                <input
-                  id="scorename"
-                  name="scorename"
-                  type="text"
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  placeholder="Enter your name"
-                />
-                <button type="submit">Save Score</button>
-              </form>
-            </div>
+          {showNameEntryPrompt && (
+            <NameEntry
+              score={score}
+              playerName={playerName}
+              setPlayerName={setPlayerName}
+              setHighScores={setHighScores}
+              setShowNameEntryPrompt={setShowNameEntryPrompt}
+            />
           )}
 
           {isGameOver && (

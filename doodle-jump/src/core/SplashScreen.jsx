@@ -24,11 +24,7 @@ const SplashScreen = ({ setStartGame, startGame, highScores }) => {
 			<h1>Doodle Jump (clone)</h1>
 			<h2>Created by Nicholas Smith</h2>
 
-			<button onClick={setStartGame}>Play</button>
-
-			<Leaderboard highScores={highScores} />
-
-			{isDeviceMobile && motionPermision !== 'granted' && (
+			{isDeviceMobile && motionPermision !== 'granted' ? (
 				<button
 					onClick={async () => {
 						if (window.DeviceOrientationEvent?.requestPermission) {
@@ -41,7 +37,11 @@ const SplashScreen = ({ setStartGame, startGame, highScores }) => {
 				>
 					Enable Motion Controls
 				</button>
+			) : (
+				<button onClick={setStartGame}>Play</button>
 			)}
+
+			<Leaderboard highScores={highScores} />
 		</div>
 	);
 };

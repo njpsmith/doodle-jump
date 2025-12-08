@@ -1,55 +1,14 @@
-import { randomFromTwoRanges, randomRange } from './utils';
+export const GAME_WIDTH = 400;
 
-const PLATFORM_HEIGHT = 11;
-const PLATFORM_WIDTH = 60;
+export const ACCELERATION = 1600; // px/s²
+export const FRICTION = 0.92; // multiplies velocity per frame
 
-const xPositionNotInLineWithDood = randomFromTwoRanges();
+export const OUT_OF_BOUNDS_HEIGHT = 650;
 
-export const defaultPlatforms = [
-	{ x: 155, y: 480, width: PLATFORM_WIDTH, touched: false },
-	{ x: 60, y: 400, width: PLATFORM_WIDTH, touched: false },
-	{ x: 250, y: 350, width: PLATFORM_WIDTH, touched: false },
-	{ x: 310, y: 300, width: PLATFORM_WIDTH, touched: false },
-	{
-		x: xPositionNotInLineWithDood,
-		y: 250,
-		width: PLATFORM_WIDTH,
-		height: PLATFORM_HEIGHT,
-		touched: false,
-	},
-	{
-		x: randomRange(40, 320),
-		y: 200,
-		width: PLATFORM_WIDTH,
-		height: PLATFORM_HEIGHT,
-		touched: false,
-	},
-	{
-		x: randomRange(40, 320),
-		y: randomRange(135, 140),
-		width: PLATFORM_WIDTH,
-		height: PLATFORM_HEIGHT,
-		touched: false,
-	},
-	{
-		x: randomRange(40, 320),
-		y: randomRange(90, 100),
-		width: PLATFORM_WIDTH,
-		height: PLATFORM_HEIGHT,
-		touched: false,
-	},
-	{
-		x: randomRange(30, 370),
-		y: randomRange(25, 40),
-		width: PLATFORM_WIDTH,
-		height: PLATFORM_HEIGHT,
-		touched: false,
-	},
-	{
-		x: randomRange(30, 370),
-		y: randomRange(5, 10),
-		width: PLATFORM_WIDTH,
-		height: PLATFORM_HEIGHT,
-		touched: false,
-	},
-];
+export const SCROLL_THRESHOLD = 220; // px
+
+export const DOOD_WIDTH = 60;
+export const DOOD_HEIGHT = 60;
+
+export const PLATFORM_HEIGHT = 11;
+export const PLATFORM_WIDTH = 60;

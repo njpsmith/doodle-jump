@@ -1,27 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import Platforms from './Platforms';
-// import { useTiltControl } from './TiltControls';
 import { isMobile } from '../utils';
-import { defaultPlatforms } from '../constants';
+import { defaultPlatforms } from './Platforms';
 import { randomFromTwoRanges, randomRange } from '../utils';
 import jumpSound from '../assets/sounds/jump.mp3';
-
-// const tilt = useTiltControl();
-
-const GAME_WIDTH = 400;
-
-const ACCELERATION = 1600; // px/s²
-const FRICTION = 0.92; // multiplies velocity per frame
-
-const PLATFORM_HEIGHT = 11;
-const PLATFORM_WIDTH = 60;
-
-const OUT_OF_BOUNDS_HEIGHT = 650;
-
-const SCROLL_THRESHOLD = 220; // px
-
-const DOOD_WIDTH = 60;
-const DOOD_HEIGHT = 60;
+import {
+	GAME_WIDTH,
+	ACCELERATION,
+	FRICTION,
+	PLATFORM_HEIGHT,
+	PLATFORM_WIDTH,
+	OUT_OF_BOUNDS_HEIGHT,
+	SCROLL_THRESHOLD,
+	DOOD_WIDTH,
+	DOOD_HEIGHT,
+} from '../constants';
 
 const Game = ({
 	startGame,

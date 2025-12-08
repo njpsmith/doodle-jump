@@ -15,7 +15,6 @@ const NameEntry = ({
 
 		if (playerName === '') {
 			setShowError(true);
-			console.log('setNameFieldTouched');
 			return;
 		}
 
@@ -28,6 +27,8 @@ const NameEntry = ({
 
 			return updated;
 		});
+
+		setPlayerName(''); // Reset the entered name after submission
 
 		// hide prompt
 		setShowNameEntryPrompt(false);
